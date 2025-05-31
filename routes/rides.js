@@ -8,7 +8,7 @@ router.get('/', async (req, res) => {
     const rides = await Ride.find();
     res.json(rides);
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error });
+    res.status(500).json({ error: 'Server error', details: error.message });
   }
 });
 
@@ -26,18 +26,19 @@ router.post('/', async (req, res) => {
 // PUT /rides/:id - update ride status by ID
 router.put('/:id', async (req, res) => {
   try {
-    const rideId = req.params.id;
-    const updateData = req.body;
-
-    const updatedRide = await Ride.findByIdAndUpdate(rideId, updateData, { new: true });
+    const updatedRide = await Ride.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true }
+    );
 
     if (!updatedRide) {
-      return res.status(404).json({ message: 'Ride not found' });
+      return res.status(404).json({ error: 'Ride not found' });
     }
 
-    res.json(updatedRide);
+    res.json(updatedRide); // ✅ return only the updated ride
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error });
+    res.status(500).json({ error: 'Server error', details: error.message });
   }
 });
 
@@ -47,13 +48,14 @@ router.delete('/:id', async (req, res) => {
     const deletedRide = await Ride.findByIdAndDelete(req.params.id);
 
     if (!deletedRide) {
-      return res.status(404).json({ message: 'Ride not found' });
+      return res.status(404).json({ error: 'Ride not found' });
     }
 
-    res.json({ message: 'Ride deleted successfully' });
+    res.json(deletedRide); // ✅ return the deleted ride object
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error });
+    res.status(500).json({ error: 'Server error', details: error.message });
   }
 });
 
 module.exports = router;
+
